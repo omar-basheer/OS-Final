@@ -14,4 +14,8 @@ struct CPU_Scheduler {
   struct Queue *ready_queue;
 };
 
+struct CPU_Scheduler* initScheduler(int num_processes, struct Process *processes);
+void addToReadyQueue(struct CPU_Scheduler* scheduler, struct Process* process);
+struct Process* getNextProcess(struct CPU_Scheduler* scheduler);
+
 #endif

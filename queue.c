@@ -41,7 +41,7 @@ void enqueue (struct Queue* queue, struct Process* process){
 
 };
 
-struct Process* dequeue (struct Queue* queue, struct Process* process){
+struct Process* dequeue (struct Queue* queue){
   struct QueueNode* newNode = (struct QueueNode*)malloc(sizeof(struct QueueNode));
   if (isEmpty(queue)){
     printf("Queue is empty. Cannot dequeue.\n");

@@ -24,11 +24,11 @@ int main(){
 
     // Simulating Shortest Job First Scheduling
     int num_processes3 = 4;
-    int arrival_times3[] = {0, 1, 3, 5};
-    int burst_times3[] = {6, 3, 7, 4};
+    int arrival_times3[] = {0, 1, 2, 3};
+    int burst_times3[] = {6, 4, 2, 3};
     int priorities3[] = {0, 0, 0, 0};
     struct CPU_Scheduler* scheduler3 = initScheduler(num_processes3, arrival_times3, burst_times3, priorities3);
     printProcesses(scheduler3);
-    sjn(scheduler3->ready_queue);
+    runPreemptiveSJF(scheduler3);
 
 }

@@ -8,5 +8,6 @@ void sjf(struct Queue* ready_queue);
 void priority_scheduler(struct Queue* queue);
 void shortestTimeRemaining(struct Queue* queue);
 void sjn(struct Queue* ready_queue);
+void runPreemptiveSJF(struct CPU_Scheduler* scheduler);
 
 #endif // ALGORITHMS_H

@@ -7,24 +7,33 @@
 #define TIME_SLICE 2
 
 void round_robin(struct Queue* ready_queue){
+  int current_time = 0;
   while(!isEmpty(ready_queue)){
     struct Process* current_process = dequeue(ready_queue);
-    int remaining_time = current_process->burst_time;
-
-    while (remaining_time > 0){
-      if (remaining_time <= TIME_SLICE){
+    int remaining_time = current_process->remaining_time;
+      if (remaining_time <= 0){
         //process completes within time slice
-        updateProcess(current_process, 0, current_process->completion_time + remaining_time);
+        current_time = current_time + remaining_time;
+        current_process->completion_time = current_process->completion_time + remaining_time;
+        updateProcess(current_process, 0, current_process->completion_time);
         printf("Process %d completed at time %d\n", current_process->process_id, current_process->completion_time);
-        break;
       }
       else{
         // process needs more time, stop execution at time slice
-        remaining_time -= TIME_SLICE;
-        updateProcess(current_process, remaining_time, 0);
-        printf("Process %d preemted at time %d\n", current_process->process_id, current_process->completion_time + TIME_SLICE);
+        if (remaining_time < TIME_SLICE){
+          current_time = current_time + remaining_time;
+        }
+        else {
+          current_time = current_time + TIME_SLICE;
+        }
+        current_process->completion_time = current_time;
+        remaining_time =  remaining_time - TIME_SLICE;
+        if (remaining_time < 0){
+          remaining_time = 0;
+        };
+        updateProcess(current_process, remaining_time, current_process->completion_time);
+        printf("Process %d preemted at time %d\n", current_process->process_id, current_process->completion_time);
         enqueue(ready_queue, current_process);
-      }
     }
   }
 };
@@ -42,7 +51,7 @@ void sjf(struct Queue* ready_queue){
   }
 
   // Execute processes in the sorted order
-  while(!isEmoty(ready_queue)){
+  while(!isEmpty(ready_queue)){
     struct Process* current_process = dequeue(ready_queue);
     int remaining_time = current_process->burst_time;
 
@@ -141,10 +150,12 @@ void shortestTimeRemaining(struct Queue* queue){
                 calculateTurnaroundTime(shortestRemainingProcess);
                 calculateWaitingTime(shortestRemainingProcess, currentTime);
                 totalProcessses--;
+                printf("Process %d completed at time %d.\n", shortestRemainingProcess->process_id, currentTime);
             }
             else{
                 shortestRemainingProcess->remaining_time = remainingTime;
                 enqueue(tempQueue, shortestRemainingProcess);
+                printf("Process %d preempted at time %d.\n", shortestRemainingProcess->process_id, currentTime);
             }
         }
 
@@ -152,9 +163,38 @@ void shortestTimeRemaining(struct Queue* queue){
             currentTime++;
         }
     }
-
-
 }
+
+
+void sjn(struct Queue* ready_queue) {
+    while (!isEmpty(ready_queue)) {
+        // Sort the ready queue based on burst time
+        for (struct QueueNode* i = ready_queue->head; i != NULL; i = i->next) {
+            for (struct QueueNode* j = i->next; j != NULL; j = j->next) {
+                if (i->process->burst_time > j->process->burst_time) {
+                    struct Process* temp = i->process;
+                    i->process = j->process;
+                    j->process = temp;
+                }
+            }
+        }
+
+        // Dequeue the process with the shortest burst time
+        struct Process* current_process = dequeue(ready_queue);
+        int remaining_time = current_process->remaining_time;
+
+        // Simulate execution of the process for a time quantum (e.g., 1 unit of time)
+        if (remaining_time > 0) {
+            updateProcess(current_process, remaining_time - 1, current_process->completion_time);
+            printf("Process %d preempted at time %d\n", current_process->process_id, current_process->completion_time);
+            // Re-enqueue the process back into the ready queue for future execution
+            enqueue(ready_queue, current_process);
+        } else {
+            printf("Process %d completed at time %d\n", current_process->process_id, current_process->completion_time);
+        }
+    }
+}
+
 
 
 

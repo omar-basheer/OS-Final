@@ -10,7 +10,7 @@ struct Queue *initQueue() {
   }
   queue->head = NULL;
   queue->tail = NULL;
-  queue->size = NULL;
+  queue->size = 0;
 
   return queue;
 };

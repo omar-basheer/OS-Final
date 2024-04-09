@@ -30,7 +30,7 @@ void calculateTurnaroundTime(struct Process* process) {
     process->turnaround_time = process->completion_time - process->arrival_time;
 }
 
-void calculateWaitingTime(struct Process* process, int total_time) {
+void calculateWaitingTime(struct Process* process) {
     process->waiting_time = process->turnaround_time - process->burst_time;
 }
 

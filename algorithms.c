@@ -10,13 +10,24 @@ void round_robin(struct Queue* ready_queue){
   int current_time = 0;
   while(!isEmpty(ready_queue)){
     struct Process* current_process = dequeue(ready_queue);
+
     int remaining_time = current_process->remaining_time;
       if (remaining_time <= 0){
         //process completes within time slice
         current_time = current_time + remaining_time;
         current_process->completion_time = current_process->completion_time + remaining_time;
+
         updateProcess(current_process, 0, current_process->completion_time);
-        printf("Process %d completed at time %d\n", current_process->process_id, current_process->completion_time);
+        calculateTurnaroundTime(current_process);
+        calculateWaitingTime(current_process);
+
+        printf("Process %d completed at time %d, turnaround time: %d, waiting time: %d\n", 
+          current_process->process_id, 
+          current_process->completion_time, 
+          current_process->turnaround_time, 
+          current_process->waiting_time
+        );
+
       }
       else{
         // process needs more time, stop execution at time slice
@@ -38,82 +49,48 @@ void round_robin(struct Queue* ready_queue){
   }
 };
 
-void sjf(struct Queue* ready_queue){
-  // Sort the ready queue based on burst time
-  for (struct QueueNode* i = ready_queue->head; i != NULL; i = i->next){
-    for (struct QueueNode* j = i->next; j != NULL; j = j->next){
-      if (i->process->burst_time > j->process->burst_time){
-        struct Process* temp = i->process;
-        i->process = j->process;
-        j->process = temp;
+
+void np_sjf(struct Queue* ready_queue){
+  int current_time = 0;
+  
+  while (!isEmpty(ready_queue)) {
+    // Find the process with the shortest remaining burst time
+    struct Process* shortest_process = NULL;
+    struct QueueNode* current_node = ready_queue->head;
+    
+    while (current_node != NULL) {
+      struct Process* current_process = current_node->process;
+      
+      // Check if the process has arrived and its burst time is shorter than the current shortest burst time
+      if (current_process->arrival_time <= current_time &&
+          (shortest_process == NULL || current_process->burst_time < shortest_process->burst_time)) {
+        shortest_process = current_process;
       }
+      
+      current_node = current_node->next;
+    }
+    
+    if (shortest_process == NULL) {
+      // No process is ready to execute, increment current time
+      current_time++;
+    } else {
+      // Execute the shortest process
+      dequeueProcess(ready_queue, shortest_process);
+      shortest_process->completion_time = current_time + shortest_process->burst_time;
+      calculateTurnaroundTime(shortest_process);
+      calculateWaitingTime(shortest_process);
+      
+      printf("Process %d completed at time %d, turnaround time: %d, waiting time: %d\n", 
+             shortest_process->process_id, 
+             shortest_process->completion_time, 
+             shortest_process->turnaround_time, 
+             shortest_process->waiting_time
+            );
+      
+      current_time = shortest_process->completion_time;
     }
   }
-
-  // Execute processes in the sorted order
-  while(!isEmpty(ready_queue)){
-    struct Process* current_process = dequeue(ready_queue);
-    int remaining_time = current_process->burst_time;
-
-    updateProcess(current_process, 0, current_process->burst_time);
-    printf("Process %d completed at time %d\n", current_process->process_id, current_process->completion_time);
-  }
-};
-
-
-void priority_scheduler(struct Queue* queue){
-
-    if(isEmpty(queue)){
-        printf("Queue is empty. Cannot schedule.\n");
-        return;
-    };
-
-    struct Queue* tempQueue = initQueue();
-    struct Process* currentProcess = NULL;
-    struct Process* highestPriorityProcess = NULL;
-    int totalProcessses = queue ->size;
-    int currentTime = 0;
-
-    while (totalProcessses > 0){
-        while(!isEmpty(queue) && queue->head->process->arrival_time <= currentTime){
-            currentProcess = dequeue(queue);
-            enqueue(tempQueue, currentProcess);
-        }
-
-        highestPriorityProcess = NULL;
-        struct QueueNode* tempNode = tempQueue->head;
-
-        while (tempNode != NULL){
-            if(highestPriorityProcess == NULL || tempNode->process->priority < highestPriorityProcess->priority){
-                highestPriorityProcess = tempNode ->process;
-            }
-            tempNode = tempNode->next;
-        }
-
-        if(highestPriorityProcess != NULL){
-            int remainingTime = highestPriorityProcess->remaining_time - 1;
-            currentTime++;
-            if(remainingTime == 0){
-                highestPriorityProcess->completion_time = currentTime;
-                calculateTurnaroundTime(highestPriorityProcess);
-                calculateWaitingTime(highestPriorityProcess, currentTime);
-                totalProcessses--;
-            }
-            else{
-                highestPriorityProcess->remaining_time = remainingTime;
-                enqueue(tempQueue, highestPriorityProcess);
-            }
-        }
-
-        else{
-            currentTime++;
-        }
-
-    }
-
-
 }
-
 
 
 void shortestTimeRemaining(struct Queue* queue){
@@ -148,7 +125,7 @@ void shortestTimeRemaining(struct Queue* queue){
             if(remainingTime == 0){
                 shortestRemainingProcess->completion_time = currentTime;
                 calculateTurnaroundTime(shortestRemainingProcess);
-                calculateWaitingTime(shortestRemainingProcess, currentTime);
+                calculateWaitingTime(shortestRemainingProcess);
                 totalProcessses--;
                 printf("Process %d completed at time %d.\n", shortestRemainingProcess->process_id, currentTime);
             }
@@ -166,34 +143,68 @@ void shortestTimeRemaining(struct Queue* queue){
 }
 
 
-void sjn(struct Queue* ready_queue) {
-    while (!isEmpty(ready_queue)) {
-        // Sort the ready queue based on burst time
-        for (struct QueueNode* i = ready_queue->head; i != NULL; i = i->next) {
-            for (struct QueueNode* j = i->next; j != NULL; j = j->next) {
-                if (i->process->burst_time > j->process->burst_time) {
-                    struct Process* temp = i->process;
-                    i->process = j->process;
-                    j->process = temp;
+void mlfq(struct Queue *queues[], int num_queues) {
+    int current_time = 0;
+    int current_queue = 0;
+    int time_quantum = 2;
+
+    // Iterate until all queues are empty
+    while (1) {
+        struct Queue *current_queue_ptr = queues[current_queue];
+
+        // Check if the current queue is not empty
+        if (!isEmpty(current_queue_ptr)) {
+            struct Process *current_process = dequeue(current_queue_ptr);
+
+            if (current_process->burst_time - current_process->remaining_time == 0) {
+                printf("Round Robin scheduling begins for process %d at time %d\n", current_process->process_id, current_time);
+            }
+
+            // Execute the process for the time quantum or until completion
+            int execution_time = (current_process->remaining_time < time_quantum) ? current_process->remaining_time : time_quantum;
+            current_time += execution_time;
+            current_process->remaining_time -= execution_time;
+
+            // Print message when process is moved to the next lower priority queue
+            if (current_process->remaining_time > 0) {
+                if (current_queue < num_queues - 1) {
+                    printf("Process %d moved to lower priority queue at time %d\n", current_process->process_id, current_time);
+                } else {
+                    printf("Process %d remains in the lowest priority queue at time %d\n", current_process->process_id, current_time);
                 }
+            }
+
+            // Process has completed execution
+            if (current_process->remaining_time <= 0) {
+                printf("Process %d completed at time %d\n", current_process->process_id, current_time);
+                free(current_process);
+            } else {
+                // Move the process to the end of the current queue
+                enqueue(current_queue_ptr, current_process);
             }
         }
 
-        // Dequeue the process with the shortest burst time
-        struct Process* current_process = dequeue(ready_queue);
-        int remaining_time = current_process->remaining_time;
+        // Move to the next non-empty queue
+        do {
+            current_queue = (current_queue + 1) % num_queues;
+        } while (isEmpty(queues[current_queue]));
 
-        // Simulate execution of the process for a time quantum (e.g., 1 unit of time)
-        if (remaining_time > 0) {
-            updateProcess(current_process, remaining_time - 1, current_process->completion_time);
-            printf("Process %d preempted at time %d\n", current_process->process_id, current_process->completion_time);
-            // Re-enqueue the process back into the ready queue for future execution
-            enqueue(ready_queue, current_process);
-        } else {
-            printf("Process %d completed at time %d\n", current_process->process_id, current_process->completion_time);
+        // Check if all queues are empty
+        int all_empty = 1;
+        for (int i = 0; i < num_queues; i++) {
+            if (!isEmpty(queues[i])) {
+                all_empty = 0;
+                break;
+            }
+        }
+
+        // Exit loop if all queues are empty
+        if (all_empty) {
+            break;
         }
     }
 }
+
 
 
 

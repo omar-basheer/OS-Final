@@ -4,9 +4,9 @@
 #include "queue.h"
 
 void round_robin(struct Queue* ready_queue);
-void sjf(struct Queue* ready_queue);
-void priority_scheduler(struct Queue* queue);
+void np_sjf(struct Queue* ready_queue);
 void shortestTimeRemaining(struct Queue* queue);
-void sjn(struct Queue* ready_queue);
+void mlfq(struct Queue *queues[], int num_queues);
+// void sjn(struct Queue* ready_queue);
 
 #endif // ALGORITHMS_H

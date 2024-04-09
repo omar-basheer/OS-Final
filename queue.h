@@ -17,6 +17,8 @@ struct Queue {
 struct Queue *initQueue();
 void enqueue(struct Queue *queue, struct Process *process);
 struct Process *dequeue(struct Queue *queue);
+struct Process *peek(struct Queue *queue);
 int isEmpty(struct Queue *queue);
+
 
 #endif /* QUEUE_H */

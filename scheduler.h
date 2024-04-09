@@ -18,4 +18,5 @@ struct CPU_Scheduler* initScheduler(int num_processes, int *arrival_times, int *
 void addToReadyQueue(struct CPU_Scheduler* scheduler, struct Process* process);
 struct Process* getNextProcess(struct CPU_Scheduler* scheduler);
 void printProcesses(struct CPU_Scheduler* scheduler);
+int areAllProcessesCompleted(struct CPU_Scheduler* scheduler);
 #endif

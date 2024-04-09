@@ -45,3 +45,12 @@ void printProcesses(struct CPU_Scheduler* scheduler) {
     }
     printf("-----------------------------------------------------------------\n");
 }
+
+int areAllProcessesCompleted(struct CPU_Scheduler* scheduler) {
+    for (int i = 0; i < scheduler->num_processes; i++) {
+        if (scheduler->processes[i].remaining_time > 0) {
+            return -1; // Found a process that is not yet completed
+        }
+    }
+    return 0; // All processes have completed
+}

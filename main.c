@@ -5,13 +5,13 @@
 
 int main(){
     // Simulating Round Robin Scheduling
-    // int num_processes1 = 4;
-    // int arrival_times1[] = {0, 1, 3, 5};
-    // int burst_times1[] = {6, 3, 7, 4};
-    // int priorities1[] = {0, 0, 0, 0};
-    // struct CPU_Scheduler* scheduler1 = initScheduler(num_processes1, arrival_times1, burst_times1, priorities1);
-    // printProcesses(scheduler1);
-    // round_robin(scheduler1->ready_queue);
+    int num_processes1 = 4;
+    int arrival_times1[] = {0, 1, 3, 5};
+    int burst_times1[] = {6, 3, 7, 4};
+    int priorities1[] = {0, 0, 0, 0};
+    struct CPU_Scheduler* scheduler1 = initScheduler(num_processes1, arrival_times1, burst_times1, priorities1);
+    printProcesses(scheduler1);
+    round_robin(scheduler1->ready_queue);
 
     // Simulating Shortest Job First Scheduling
     // int num_processes2 = 4;

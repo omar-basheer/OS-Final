@@ -8,6 +8,7 @@
 
 void round_robin(struct Queue *ready_queue)
 {
+  printf("Round Robin Scheduling\n");
   int current_time = 0;
   while (!isEmpty(ready_queue))
   {
@@ -56,6 +57,7 @@ void round_robin(struct Queue *ready_queue)
 
 void np_sjf(struct Queue *ready_queue)
 {
+  printf("Shortest Job First Scheduling\n");
   int current_time = 0;
 
   while (!isEmpty(ready_queue))
@@ -163,6 +165,7 @@ void shortestTimeRemaining(struct Queue *queue)
 
 void mlfq(struct Queue *queue, int q1_time_slice, int q2_time_slice)
 {
+  printf("Multi-Level Feedback Queue Scheduling\n");
   struct Queue *Queue1 = queue;
   struct Queue *Queue2 = initQueue();
   struct Queue *Queue3 = initQueue();
@@ -316,6 +319,7 @@ void mlfq(struct Queue *queue, int q1_time_slice, int q2_time_slice)
 
 void runPreemptiveSJF(struct CPU_Scheduler *scheduler)
 {
+  printf("Preemptive Shortest Job First Scheduling\n");
   int currentTime = 0;
   struct Process *currentProcess = NULL;
   int isCPUIdle = 1;

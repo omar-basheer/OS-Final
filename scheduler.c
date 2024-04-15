@@ -44,6 +44,7 @@ void printProcesses(struct CPU_Scheduler* scheduler) {
         printf("| %-11d| %-13d| %-11d| %-9d| %-15d|\n", process->process_id, process->arrival_time, process->burst_time, process->priority, process->remaining_time);
     }
     printf("-----------------------------------------------------------------\n");
+    printf("\n");
 }
 
 int areAllProcessesCompleted(struct CPU_Scheduler* scheduler) {

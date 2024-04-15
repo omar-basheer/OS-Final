@@ -41,6 +41,8 @@ void enqueue (struct Queue* queue, struct Process* process){
 
 };
 
+
+
 struct Process* dequeue (struct Queue* queue){
   struct QueueNode* newNode = (struct QueueNode*)malloc(sizeof(struct QueueNode));
   if (isEmpty(queue)){
@@ -96,3 +98,10 @@ struct Process* dequeueProcess(struct Queue* queue, struct Process* process_to_r
     exit(EXIT_FAILURE);
 }
 
+
+struct Process* peek(struct Queue* queue) {
+    if (isEmpty(queue)) {
+        return NULL; // Queue is empty, nothing to peek at
+    }
+    return queue->head->process; // Return the process at the front of the queue without dequeuing it
+}

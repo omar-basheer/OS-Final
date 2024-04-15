@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "queue.h"
-// #include "process.h"
-// #include "scheduler.h"
+#include "process.h"
+#include "scheduler.h"
 
 #define TIME_SLICE 2
 
@@ -161,7 +161,6 @@ void shortestTimeRemaining(struct Queue *queue)
   }
 }
 
-
 void mlfq(struct Queue *queue, int q1_time_slice, int q2_time_slice)
 {
   struct Queue *Queue1 = queue;
@@ -215,11 +214,13 @@ void mlfq(struct Queue *queue, int q1_time_slice, int q2_time_slice)
             remaining_time = 0;
           };
           updateProcess(current_process, remaining_time, current_process->completion_time);
-          if (remaining_time <= q1_time_slice){
+          if (remaining_time <= q1_time_slice)
+          {
             printf("Process %d preemted at time %d in queue 1, enqueued on same priority queue 1\n", current_process->process_id, current_process->completion_time);
             enqueue(Queue1, current_process);
           }
-          else{
+          else
+          {
             printf("Process %d preemted at time %d in queue 1, moved to lower priority queue 2\n", current_process->process_id, current_process->completion_time);
             enqueue(Queue2, current_process);
           }
@@ -275,11 +276,13 @@ void mlfq(struct Queue *queue, int q1_time_slice, int q2_time_slice)
             remaining_time = 0;
           };
           updateProcess(current_process, remaining_time, current_process->completion_time);
-          if (remaining_time <= q2_time_slice){
+          if (remaining_time <= q2_time_slice)
+          {
             printf("Process %d preemted at time %d in queue 2, enqueued on same priority queue 2\n", current_process->process_id, current_process->completion_time);
             enqueue(Queue2, current_process);
           }
-          else{
+          else
+          {
             printf("Process %d preemted at time %d in queue 2, moved to lower priority queue 3\n", current_process->process_id, current_process->completion_time);
             enqueue(Queue3, current_process);
           }
@@ -308,5 +311,75 @@ void mlfq(struct Queue *queue, int q1_time_slice, int q2_time_slice)
                current_process->waiting_time);
       }
     }
-  } 
+  }
+}
+
+void runPreemptiveSJF(struct CPU_Scheduler *scheduler)
+{
+  int currentTime = 0;
+  struct Process *currentProcess = NULL;
+  int isCPUIdle = 1;
+
+  printf("Starting Preemptive SJF Simulation\n");
+
+  while (!isEmpty(scheduler->ready_queue))
+  {
+    // Check and enqueue newly arrived processes
+    for (int i = 0; i < scheduler->num_processes; i++)
+    {
+      if (scheduler->processes[i].arrival_time == currentTime)
+      {
+        printf("Time %d: Process %d arrives\n", currentTime, scheduler->processes[i].process_id);
+        enqueue(scheduler->ready_queue, &scheduler->processes[i]);
+      }
+    }
+
+    // Decide on preemption or continuation of the current process
+    if (!isCPUIdle && !isEmpty(scheduler->ready_queue) &&
+        peek(scheduler->ready_queue)->remaining_time < currentProcess->remaining_time)
+    {
+      if (peek(scheduler->ready_queue)->remaining_time > 0)
+      {
+        printf("Time %d: Process %d preempted by Process %d\n", currentTime, currentProcess->process_id, peek(scheduler->ready_queue)->process_id);
+        currentProcess->remaining_time -= (currentTime - currentProcess->last_start_time);
+        enqueue(scheduler->ready_queue, currentProcess);
+        isCPUIdle = 1;
+      }
+
+      else
+      {
+        enqueue(scheduler->ready_queue, currentProcess);
+        currentProcess = dequeue(scheduler->ready_queue);
+        printf("Time %d: Process %d starts execution\n", currentTime, currentProcess->process_id);
+        currentProcess->last_start_time = currentTime;
+      }
+    }
+
+    if (isCPUIdle && !isEmpty(scheduler->ready_queue))
+    {
+      currentProcess = dequeue(scheduler->ready_queue);
+      if (currentProcess->remaining_time > 0)
+      {
+        printf("Time %d: Process %d starts execution\n", currentTime, currentProcess->process_id);
+        currentProcess->last_start_time = currentTime;
+        isCPUIdle = 0;
+      }
+    }
+
+    // Process execution for a time unit
+    if (!isCPUIdle)
+    {
+      currentProcess->remaining_time--;
+      if (currentProcess->remaining_time <= 0)
+      {
+        printf("Time %d: Process %d completes execution\n", currentTime + 1, currentProcess->process_id);
+        isCPUIdle = 1;
+        currentProcess = NULL;
+      }
+    }
+
+    currentTime++;
+  }
+
+  printf("Preemptive SJF Simulation Complete\n");
 }

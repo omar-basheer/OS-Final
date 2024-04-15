@@ -23,14 +23,23 @@ int main(){
     np_sjf(scheduler2->ready_queue);
 
     // Simulating Shortest Job First Scheduling
-    int num_processes3 = 4;
-    int arrival_times3[] = {0, 1, 3, 5};
-    int burst_times3[] = {6, 3, 7, 4};
-    int priorities3[] = {0, 0, 0, 0};
+    // int num_processes3 = 4;
+    // int arrival_times3[] = {0, 1, 2, 3};
+    // int burst_times3[] = {6, 4, 2, 3};
+    // int priorities3[] = {0, 0, 0, 0};
+    // struct CPU_Scheduler* scheduler3 = initScheduler(num_processes3, arrival_times3, burst_times3, priorities3);
+    // printProcesses(scheduler3);
+    // runPreemptiveSJF(scheduler3);
+
+
+// Simulating Shortest Job First Scheduling
+    int num_processes3 = 2;
+    int arrival_times3[] = {0, 1};
+    int burst_times3[] = {6, 4};
+    int priorities3[] = {0, 0};
     struct CPU_Scheduler* scheduler3 = initScheduler(num_processes3, arrival_times3, burst_times3, priorities3);
     printProcesses(scheduler3);
-    shortestTimeRemaining(scheduler3->ready_queue);
-
+    runPreemptiveSJF(scheduler3);
     // Simulating Multi-Level Feedback Queue Scheduling
     int num_processes4 = 4;
     int arrival_times4[] = {0, 1, 3, 5};

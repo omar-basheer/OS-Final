@@ -12,6 +12,7 @@ struct Process {
   int completion_time;
   int turnaround_time;
   int waiting_time;
+  int last_start_time;
 };
 
 

@@ -6,7 +6,8 @@
 void round_robin(struct Queue* ready_queue);
 void np_sjf(struct Queue* ready_queue);
 void shortestTimeRemaining(struct Queue* queue);
-void mlfq(struct Queue *queues[], int num_queues);
+// void mlfq(struct Queue *queues[], int num_queues);
+void mlfq(struct Queue *queue, int q1_time_slice, int q2_time_slice);
 // void sjn(struct Queue* ready_queue);
 
 #endif // ALGORITHMS_H

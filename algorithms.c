@@ -102,65 +102,6 @@ void np_sjf(struct Queue *ready_queue)
   }
 }
 
-void shortestTimeRemaining(struct Queue *queue)
-{
-  if (isEmpty(queue))
-  {
-    printf("Queue is empty. Cannot schedule.\n");
-    return;
-  };
-
-  struct Queue *tempQueue = initQueue();
-  struct Process *currentProcess = NULL;
-  int totalProcessses = queue->size;
-  int currentTime = 0;
-
-  while (totalProcessses > 0)
-  {
-    while (!isEmpty(queue) && queue->head->process->arrival_time <= currentTime)
-    {
-      currentProcess = dequeue(queue);
-      enqueue(tempQueue, currentProcess);
-    }
-
-    struct QueueNode *tempNode = tempQueue->head;
-    struct Process *shortestRemainingProcess = tempNode->process;
-    while (tempNode != NULL)
-    {
-      if (tempNode->process->remaining_time < shortestRemainingProcess->remaining_time)
-      {
-        shortestRemainingProcess = tempNode->process;
-      }
-      tempNode = tempNode->next;
-    }
-
-    if (shortestRemainingProcess != NULL)
-    {
-      int remainingTime = shortestRemainingProcess->remaining_time - 1;
-      currentTime++;
-      if (remainingTime == 0)
-      {
-        shortestRemainingProcess->completion_time = currentTime;
-        calculateTurnaroundTime(shortestRemainingProcess);
-        calculateWaitingTime(shortestRemainingProcess);
-        totalProcessses--;
-        printf("Process %d completed at time %d.\n", shortestRemainingProcess->process_id, currentTime);
-      }
-      else
-      {
-        shortestRemainingProcess->remaining_time = remainingTime;
-        enqueue(tempQueue, shortestRemainingProcess);
-        printf("Process %d preempted at time %d.\n", shortestRemainingProcess->process_id, currentTime);
-      }
-    }
-
-    else
-    {
-      currentTime++;
-    }
-  }
-}
-
 void mlfq(struct Queue *queue, int q1_time_slice, int q2_time_slice)
 {
   struct Queue *Queue1 = queue;
@@ -373,6 +314,10 @@ void runPreemptiveSJF(struct CPU_Scheduler *scheduler)
       if (currentProcess->remaining_time <= 0)
       {
         printf("Time %d: Process %d completes execution\n", currentTime + 1, currentProcess->process_id);
+        currentProcess->completion_time = currentTime + 1;
+        calculateTurnaroundTime(currentProcess);
+        calculateWaitingTime(currentProcess);
+        printf("Process %d turnaround time: %d, waiting time: %d\n", currentProcess->process_id, currentProcess->turnaround_time, currentProcess->waiting_time);
         isCPUIdle = 1;
         currentProcess = NULL;
       }

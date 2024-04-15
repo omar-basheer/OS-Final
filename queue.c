@@ -61,6 +61,44 @@ struct Process* dequeue (struct Queue* queue){
 
 };
 
+struct Process* dequeueProcess(struct Queue* queue, struct Process* process_to_remove) {
+    if (isEmpty(queue)) {
+        printf("Queue is empty. Cannot dequeue.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    struct QueueNode* current_node = queue->head;
+    struct QueueNode* prev_node = NULL;
+
+    // Search for the process to remove
+    while (current_node != NULL) {
+        if (current_node->process == process_to_remove) {
+            if (prev_node == NULL) { // If the process to remove is the head of the queue
+                queue->head = current_node->next;
+                if (queue->head == NULL) {
+                    queue->tail = NULL;
+                }
+            } else {
+                prev_node->next = current_node->next;
+                if (current_node == queue->tail) {
+                    queue->tail = prev_node;
+                }
+            }
+            struct Process* dequeued_process = current_node->process;
+            free(current_node);
+            queue->size--;
+            return dequeued_process;
+        }
+        prev_node = current_node;
+        current_node = current_node->next;
+    }
+
+    // If the process to remove is not found in the queue
+    printf("Process not found in the queue.\n");
+    exit(EXIT_FAILURE);
+}
+
+
 struct Process* peek(struct Queue* queue) {
     if (isEmpty(queue)) {
         return NULL; // Queue is empty, nothing to peek at

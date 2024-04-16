@@ -1,6 +1,8 @@
 #include "scheduler.h"
 #include <stdio.h>
 #include <stdlib.h>
+# include <unistd.h>
+#include <sys/wait.h>
 
 struct CPU_Scheduler* initScheduler(int num_processes, int *arrival_times, int *burst_times) {
     struct CPU_Scheduler* scheduler = (struct CPU_Scheduler*)malloc(sizeof(struct CPU_Scheduler));

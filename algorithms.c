@@ -198,14 +198,99 @@ void np_sjf(struct Process *processes, int num_processes){
 }
 
 
-/**
- * Implements the Multi-Level Feedback Queue (MLFQ) scheduling algorithm.
- *
- * @param processes An array of Process structures representing the processes to be scheduled.
- * @param num_processes The number of processes in the processes array.
- * @param q1_time_slice The time slice for the first priority queue.
- * @param q2_time_slice The time slice for the second priority queue.
- */
+void pp_sjf(struct Process *processes, int num_processes){
+  struct Queue *ready_queue = initQueue();
+  int current_time = 0;
+  int total_burst_time = 0;
+
+  for (int i = 0; i<num_processes; i++){
+    total_burst_time += processes[i].burst_time;
+  }
+
+  while (total_burst_time > 0){
+
+    if (!isEmpty(ready_queue)){
+      printQueue(ready_queue);
+
+      // find process with shortest remaining time
+      struct Process *shortest_process = NULL;
+      struct QueueNode *current_node = ready_queue->head;
+
+      while (current_node != NULL){
+        struct Process *current_process = current_node->process;
+
+        if (shortest_process == NULL || current_process->remaining_time < shortest_process->remaining_time){
+          shortest_process = current_process;
+        }
+        current_node = current_node->next;
+      }
+      printf("shortest process in ready queue: %d\n", shortest_process->process_id);
+
+      // execute the process for one time slice
+      dequeueProcess(ready_queue, shortest_process);
+      current_time += 1;
+      printf("current time: %d, updated in execute for time slice\n", current_time);
+      shortest_process->remaining_time -= 1;
+      shortest_process->completion_time = current_time;
+      total_burst_time -= 1;
+      printf("Process %d preempted at time %d\n", shortest_process->process_id, current_time);
+
+      // check if any new processes have arrived and then to the ready queue
+      printf("\nChecking for new processes after execution\n");
+      for (int j = 0; j<num_processes; j++){
+        if (processes[j].arrival_time <= current_time && processes[j].past == false){
+          printf("Process %d arrived at time %d, current time: %d\n", processes[j].process_id, processes[j].arrival_time, current_time);
+          processes[j].past = true;
+          enqueue(ready_queue, &processes[j]);
+        }
+      }
+
+      // add the current process back to the queue if it has remaining time
+      if (shortest_process->remaining_time > 0){
+        enqueue(ready_queue, shortest_process);
+      }
+      else{
+        shortest_process->completion_time = current_time;
+        calculateTurnaroundTime(shortest_process);
+        calculateWaitingTime(shortest_process);
+
+        printf("Process %d completed at time %d, turnaround time: %d, waiting time: %d\n",
+               shortest_process->process_id,
+               shortest_process->completion_time,
+               shortest_process->turnaround_time,
+               shortest_process->waiting_time);
+      }
+
+      printf("\n");
+
+    }else{
+      printf("current time: %d\n", current_time);
+      printf("\n");
+
+      printf("checking for new processes\n");
+      for (int j = 0; j<num_processes; j++){
+        if (processes[j].arrival_time <= current_time && processes[j].past == false){
+          printf("Process %d arrived at time %d, current time: %d\n", processes[j].process_id, processes[j].arrival_time, current_time);
+          processes[j].past = true;
+          enqueue(ready_queue, &processes[j]);
+        }
+      }
+
+      if (isEmpty(ready_queue)){
+        current_time++;
+        printf("no new processes have arrived, current time: %d\n", current_time);
+      }
+
+      printQueue(ready_queue);
+      printf("\n");
+
+      if (total_burst_time <= 0){
+        break;
+      }
+    }
+  }
+}
+
 void mlfq (struct Process *processes, int num_processes, int q1_time_slice, int q2_time_slice){
   struct Queue *ready_queue = initQueue();
   struct Queue *queue2 = initQueue();

@@ -8,6 +8,6 @@
 void round_robin(struct Process *processes, int num_processes, int time_slice);
 void np_sjf(struct Process *processes, int num_processes);
 void mlfq (struct Process *processes, int num_processes, int q1_time_slice, int q2_time_slice);
-void preemptive_sjf(struct CPU_Scheduler* scheduler);
+void pp_sjf(struct Process *processes, int num_processes);
 
 #endif // ALGORITHMS_H

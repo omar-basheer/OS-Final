@@ -8,7 +8,6 @@ struct Process {
   int process_id;
   int arrival_time;
   int burst_time;
-  int priority;
   int remaining_time;
   int completion_time;
   int turnaround_time;
@@ -18,7 +17,7 @@ struct Process {
 };
 
 
-struct Process* createProcess(int process_id, int arrival_time, int burst_time, int priority);
+struct Process* createProcess(int process_id, int arrival_time, int burst_time);
 void updateProcess(struct Process*, int remaining_time, int completion_time);
 void calculateTurnaroundTime(struct Process* process);
 void calculateWaitingTime(struct Process* process);

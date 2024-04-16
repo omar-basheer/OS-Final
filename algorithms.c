@@ -3,6 +3,7 @@
 #include "queue.h"
 #include "process.h"
 #include "scheduler.h"
+#include <stdbool.h>
 
 #define TIME_SLICE 2
 

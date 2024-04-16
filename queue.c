@@ -66,12 +66,12 @@ void printQueue(struct Queue* queue) {
     }
 
     struct QueueNode* current = queue->head;
-    printf("Queue: ");
+    printf("Queue: [");
     while (current != NULL) {
-        printf("%d ", current->process->process_id);
+        printf("Process %d,", current->process->process_id);
         current = current->next;
     }
-    printf("\n");
+    printf("]\n");
 }
 
 

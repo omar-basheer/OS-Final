@@ -22,19 +22,44 @@ struct Process* createProcess(int process_id, int arrival_time, int burst_time){
   return process;
 };
 
+/**
+ * Updates the process with the given remaining time and completion time.
+ *
+ * @param process The process to be updated.
+ * @param remaining_time The new remaining time for the process.
+ * @param completion_time The new completion time for the process.
+ */
 void updateProcess(struct Process* process, int remaining_time, int completion_time) {
     process->remaining_time = remaining_time;
     process->completion_time = completion_time;
 }
 
+/**
+ * Calculates the turnaround time for a given process.
+ * The turnaround time is the difference between the completion time and the arrival time.
+ *
+ * @param process The process for which to calculate the turnaround time.
+ */
 void calculateTurnaroundTime(struct Process* process) {
     process->turnaround_time = process->completion_time - process->arrival_time;
 }
 
+/**
+ * Calculates the waiting time for a given process.
+ * The waiting time is calculated by subtracting the burst time from the turnaround time.
+ *
+ * @param process The process for which to calculate the waiting time.
+ */
 void calculateWaitingTime(struct Process* process) {
     process->waiting_time = process->turnaround_time - process->burst_time;
 }
 
+/**
+ * Calculates various metrics for a given array of processes.
+ *
+ * @param processes The array of processes.
+ * @param num_processes The number of processes in the array.
+ */
 void calculateMetrics(struct Process* processes, int num_processes) {
     printf("\n");
     printf("Metrics:\n");
@@ -81,4 +106,3 @@ void calculateMetrics(struct Process* processes, int num_processes) {
     printf("Deadline Miss Ratio: %.2f\n", deadline_miss_ratio);
     printf("\n");
 }
-

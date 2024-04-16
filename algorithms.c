@@ -22,7 +22,7 @@ void round_robin(struct Process *processes, int num_processes, int time_slice){
       printf("process %d dequeued\n", current_process->process_id);
       printQueue(ready_queue);
 
-      // execute process for time slice or until completion
+      // execute process to completion
       if (current_process->remaining_time <= time_slice){
         current_time += current_process->remaining_time;
         printf("current time: %d, updated in execute to completion\n", current_time);
@@ -39,6 +39,7 @@ void round_robin(struct Process *processes, int num_processes, int time_slice){
                current_process->waiting_time);
       }
       else{
+        // execute process for time slice
         current_time += time_slice;
         printf("current time: %d, updated in execute for time slice\n", current_time);
         current_process->remaining_time -= time_slice;
@@ -57,6 +58,7 @@ void round_robin(struct Process *processes, int num_processes, int time_slice){
         }
       }
 
+      // Add the current process back to the ready queue if it has remaining time
       if (current_process->remaining_time > 0){
         enqueue(ready_queue, current_process);
       }
@@ -65,8 +67,8 @@ void round_robin(struct Process *processes, int num_processes, int time_slice){
     }else{
       printf("current time: %d\n", current_time);
       printf("\n");
-      printf("checking for new processes\n");
 
+      printf("checking for new processes\n");
       for (int j = 0; j<num_processes; j++){
         if (processes[j].arrival_time <= current_time && processes[j].past == false){
           printf("Process %d arrived at time %d, current time: %d\n", processes[j].process_id, processes[j].arrival_time, current_time);
@@ -93,41 +95,40 @@ void round_robin(struct Process *processes, int num_processes, int time_slice){
 
 }
 
-void np_sjf(struct Queue *ready_queue)
-{
-  printf("Shortest Job First Scheduling\n");
+void np_sjf(struct Process *processes, int num_processes){
+  struct Queue *ready_queue = initQueue();
   int current_time = 0;
+  int total_burst_time = 0;
 
-  while (!isEmpty(ready_queue))
-  {
-    // Find the process with the shortest remaining burst time
-    struct Process *shortest_process = NULL;
-    struct QueueNode *current_node = ready_queue->head;
+  for(int i = 0; i < num_processes; i++){
+    total_burst_time += processes[i].burst_time;
+  }
 
-    while (current_node != NULL)
-    {
-      struct Process *current_process = current_node->process;
+  while(total_burst_time > 0){
 
-      // Check if the process has arrived and its burst time is shorter than the current shortest burst time
-      if (current_process->arrival_time <= current_time &&
-          (shortest_process == NULL || current_process->burst_time < shortest_process->burst_time))
-      {
-        shortest_process = current_process;
+    if (!isEmpty(ready_queue)){
+      printQueue(ready_queue);
+
+      // find process with shortest remaining time
+      struct Process *shortest_process = NULL;
+      struct QueueNode *current_node = ready_queue->head;
+
+      while (current_node != NULL){
+        struct Process *current_process = current_node->process;
+
+        if (shortest_process == NULL || current_process->burst_time < shortest_process->burst_time){
+          shortest_process = current_process;
+        }
+        current_node = current_node->next;
       }
+     printf("shortest process in ready queue: %d\n", shortest_process->process_id);
 
-      current_node = current_node->next;
-    }
-
-    if (shortest_process == NULL)
-    {
-      // No process is ready to execute, increment current time
-      current_time++;
-    }
-    else
-    {
-      // Execute the shortest process
+      //execute process to completion
       dequeueProcess(ready_queue, shortest_process);
-      shortest_process->completion_time = current_time + shortest_process->burst_time;
+      current_time += shortest_process->burst_time;
+      shortest_process->completion_time = current_time;
+      total_burst_time -= shortest_process->burst_time;
+      shortest_process->remaining_time = 0;
       calculateTurnaroundTime(shortest_process);
       calculateWaitingTime(shortest_process);
 
@@ -137,164 +138,205 @@ void np_sjf(struct Queue *ready_queue)
              shortest_process->turnaround_time,
              shortest_process->waiting_time);
 
-      current_time = shortest_process->completion_time;
+      // check if any new processes have arrived and add them to the ready queue
+      printf("checking for new processes after execution\n");
+      for (int j = 0; j<num_processes; j++){
+        if (processes[j].arrival_time <= current_time && processes[j].past == false){
+          printf("Process %d arrived at time %d, current time: %d\n", processes[j].process_id, processes[j].arrival_time, current_time);
+          processes[j].past = true;
+          enqueue(ready_queue, &processes[j]);
+        }
+      }
+      printf("\n");
+
+    }else{
+      printf("current time: %d\n", current_time);
+      printf("\n");
+
+      printf("checking for new processes\n");
+      for (int j = 0; j<num_processes; j++){
+        if (processes[j].arrival_time <= current_time && processes[j].past == false){
+          printf("Process %d arrived at time %d, current time: %d\n", processes[j].process_id, processes[j].arrival_time, current_time);
+          processes[j].past = true;
+          enqueue(ready_queue, &processes[j]);
+        }
+      }
+
+      if (isEmpty(ready_queue)){
+        current_time++;
+        printf("no new processes have arrived, current time: %d\n", current_time);
+      }
+
+      printQueue(ready_queue);
+      printf("\n");
+
+      if (total_burst_time <= 0){
+        break;
+      }
+
     }
   }
+  printf("\n");
+  printf("Non-Preemptive Shortest Job First Scheduling Complete\n");
+
 }
 
-void mlfq(struct Queue *queue, int q1_time_slice, int q2_time_slice)
-{
-  printf("Multi-Level Feedback Queue Scheduling\n");
-  struct Queue *Queue1 = queue;
-  struct Queue *Queue2 = initQueue();
-  struct Queue *Queue3 = initQueue();
-  int current_time = 0;
+// void mlfq (struct Process *processes, int num+processes){
+//   struct Queue *
+// }
+// void mlfq(struct Queue *queue, int q1_time_slice, int q2_time_slice)
+// {
+//   printf("Multi-Level Feedback Queue Scheduling\n");
+//   struct Queue *Queue1 = queue;
+//   struct Queue *Queue2 = initQueue();
+//   struct Queue *Queue3 = initQueue();
+//   int current_time = 0;
 
-  // while there are processes in any queue
-  while (!isEmpty(Queue1) || !isEmpty(Queue2) || !isEmpty(Queue3))
-  {
-    if (!isEmpty(Queue1))
-    {
-      printf("Now doing RR in Queue 1\n");
-      while (!isEmpty(Queue1))
-      {
-        struct Process *current_process = dequeue(Queue1);
+//   // while there are processes in any queue
+//   while (!isEmpty(Queue1) || !isEmpty(Queue2) || !isEmpty(Queue3))
+//   {
+//     if (!isEmpty(Queue1))
+//     {
+//       printf("Now doing RR in Queue 1\n");
+//       while (!isEmpty(Queue1))
+//       {
+//         struct Process *current_process = dequeue(Queue1);
 
-        // execute process for time slice or until completion
-        int remaining_time = current_process->remaining_time;
-        if (remaining_time <= q1_time_slice)
-        {
-          // process completes within queue 1 time slice
-          current_time = current_time + remaining_time;
-          current_process->completion_time = current_process->completion_time + remaining_time;
+//         // execute process for time slice or until completion
+//         int remaining_time = current_process->remaining_time;
+//         if (remaining_time <= q1_time_slice)
+//         {
+//           // process completes within queue 1 time slice
+//           current_time = current_time + remaining_time;
+//           current_process->completion_time = current_process->completion_time + remaining_time;
 
-          updateProcess(current_process, 0, current_process->completion_time);
-          calculateTurnaroundTime(current_process);
-          calculateWaitingTime(current_process);
+//           updateProcess(current_process, 0, current_process->completion_time);
+//           calculateTurnaroundTime(current_process);
+//           calculateWaitingTime(current_process);
 
-          printf("Process %d completed at time %d in queue 1, turnaround time: %d, waiting time: %d\n",
-                 current_process->process_id,
-                 current_process->completion_time,
-                 current_process->turnaround_time,
-                 current_process->waiting_time);
-        }
-        else
-        {
-          // process needs more time, move to lower queue
-          if (remaining_time < q1_time_slice)
-          {
-            current_time = current_time + q1_time_slice;
-          }
-          else
-          {
-            current_time = current_time + q1_time_slice;
-          }
-          current_process->completion_time = current_time;
-          remaining_time = remaining_time - q1_time_slice;
-          if (remaining_time < 0)
-          {
-            remaining_time = 0;
-          };
-          updateProcess(current_process, remaining_time, current_process->completion_time);
-          if (remaining_time <= q1_time_slice)
-          {
-            printf("Process %d preemted at time %d in queue 1, enqueued on same priority queue 1\n", current_process->process_id, current_process->completion_time);
-            enqueue(Queue1, current_process);
-          }
-          else
-          {
-            printf("Process %d preemted at time %d in queue 1, moved to lower priority queue 2\n", current_process->process_id, current_process->completion_time);
-            enqueue(Queue2, current_process);
-          }
-        }
-        // add a process that has been waiting in queue 2 for after 10 seconds
-        if (current_time == 8 && !isEmpty(Queue2))
-        {
-          printf("Process %d moved to queue, 1 after %d seconds\n", Queue2->head->process->process_id, current_time);
-          enqueue(Queue1, dequeue(Queue2));
-        }
-      }
-    }
-    else if (!isEmpty(Queue2))
-    {
-      printf("Now doing RR in Queue 2\n");
-      while (!isEmpty(Queue2))
-      {
-        struct Process *current_process = dequeue(Queue2);
+//           printf("Process %d completed at time %d in queue 1, turnaround time: %d, waiting time: %d\n",
+//                  current_process->process_id,
+//                  current_process->completion_time,
+//                  current_process->turnaround_time,
+//                  current_process->waiting_time);
+//         }
+//         else
+//         {
+//           // process needs more time, move to lower queue
+//           if (remaining_time < q1_time_slice)
+//           {
+//             current_time = current_time + q1_time_slice;
+//           }
+//           else
+//           {
+//             current_time = current_time + q1_time_slice;
+//           }
+//           current_process->completion_time = current_time;
+//           remaining_time = remaining_time - q1_time_slice;
+//           if (remaining_time < 0)
+//           {
+//             remaining_time = 0;
+//           };
+//           updateProcess(current_process, remaining_time, current_process->completion_time);
+//           if (remaining_time <= q1_time_slice)
+//           {
+//             printf("Process %d preemted at time %d in queue 1, enqueued on same priority queue 1\n", current_process->process_id, current_process->completion_time);
+//             enqueue(Queue1, current_process);
+//           }
+//           else
+//           {
+//             printf("Process %d preemted at time %d in queue 1, moved to lower priority queue 2\n", current_process->process_id, current_process->completion_time);
+//             enqueue(Queue2, current_process);
+//           }
+//         }
+//         // add a process that has been waiting in queue 2 for after 10 seconds
+//         if (current_time == 8 && !isEmpty(Queue2))
+//         {
+//           printf("Process %d moved to queue, 1 after %d seconds\n", Queue2->head->process->process_id, current_time);
+//           enqueue(Queue1, dequeue(Queue2));
+//         }
+//       }
+//     }
+//     else if (!isEmpty(Queue2))
+//     {
+//       printf("Now doing RR in Queue 2\n");
+//       while (!isEmpty(Queue2))
+//       {
+//         struct Process *current_process = dequeue(Queue2);
 
-        // execute process for time slice or until completion
-        int remaining_time = current_process->remaining_time;
-        if (remaining_time <= q2_time_slice)
-        {
-          // process completes within queue 2 time slice
-          current_time = current_time + remaining_time;
-          current_process->completion_time = current_process->completion_time + remaining_time;
+//         // execute process for time slice or until completion
+//         int remaining_time = current_process->remaining_time;
+//         if (remaining_time <= q2_time_slice)
+//         {
+//           // process completes within queue 2 time slice
+//           current_time = current_time + remaining_time;
+//           current_process->completion_time = current_process->completion_time + remaining_time;
 
-          updateProcess(current_process, 0, current_process->completion_time);
-          calculateTurnaroundTime(current_process);
-          calculateWaitingTime(current_process);
+//           updateProcess(current_process, 0, current_process->completion_time);
+//           calculateTurnaroundTime(current_process);
+//           calculateWaitingTime(current_process);
 
-          printf("Process %d completed at time %d in queue 2, turnaround time: %d, waiting time: %d\n",
-                 current_process->process_id,
-                 current_process->completion_time,
-                 current_process->turnaround_time,
-                 current_process->waiting_time);
-        }
-        else
-        {
-          // process needs more time, move to lower queue
-          if (remaining_time < q2_time_slice)
-          {
-            current_time = current_time + q2_time_slice;
-          }
-          else
-          {
-            current_time = current_time + q2_time_slice;
-          }
-          current_process->completion_time = current_time;
-          remaining_time = remaining_time - q2_time_slice;
-          if (remaining_time < 0)
-          {
-            remaining_time = 0;
-          };
-          updateProcess(current_process, remaining_time, current_process->completion_time);
-          if (remaining_time <= q2_time_slice)
-          {
-            printf("Process %d preemted at time %d in queue 2, enqueued on same priority queue 2\n", current_process->process_id, current_process->completion_time);
-            enqueue(Queue2, current_process);
-          }
-          else
-          {
-            printf("Process %d preemted at time %d in queue 2, moved to lower priority queue 3\n", current_process->process_id, current_process->completion_time);
-            enqueue(Queue3, current_process);
-          }
-        }
-      }
-    }
-    else if (!isEmpty(Queue3))
-    {
-      // execute processes until completion (first come first serve)
-      printf("Now doing FCFS in Queue 3\n");
-      while (!isEmpty(Queue3))
-      {
-        struct Process *current_process = dequeue(Queue3);
-        int remaining_time = current_process->remaining_time;
-        current_time = current_time + remaining_time;
-        current_process->completion_time = current_process->completion_time + remaining_time;
+//           printf("Process %d completed at time %d in queue 2, turnaround time: %d, waiting time: %d\n",
+//                  current_process->process_id,
+//                  current_process->completion_time,
+//                  current_process->turnaround_time,
+//                  current_process->waiting_time);
+//         }
+//         else
+//         {
+//           // process needs more time, move to lower queue
+//           if (remaining_time < q2_time_slice)
+//           {
+//             current_time = current_time + q2_time_slice;
+//           }
+//           else
+//           {
+//             current_time = current_time + q2_time_slice;
+//           }
+//           current_process->completion_time = current_time;
+//           remaining_time = remaining_time - q2_time_slice;
+//           if (remaining_time < 0)
+//           {
+//             remaining_time = 0;
+//           };
+//           updateProcess(current_process, remaining_time, current_process->completion_time);
+//           if (remaining_time <= q2_time_slice)
+//           {
+//             printf("Process %d preemted at time %d in queue 2, enqueued on same priority queue 2\n", current_process->process_id, current_process->completion_time);
+//             enqueue(Queue2, current_process);
+//           }
+//           else
+//           {
+//             printf("Process %d preemted at time %d in queue 2, moved to lower priority queue 3\n", current_process->process_id, current_process->completion_time);
+//             enqueue(Queue3, current_process);
+//           }
+//         }
+//       }
+//     }
+//     else if (!isEmpty(Queue3))
+//     {
+//       // execute processes until completion (first come first serve)
+//       printf("Now doing FCFS in Queue 3\n");
+//       while (!isEmpty(Queue3))
+//       {
+//         struct Process *current_process = dequeue(Queue3);
+//         int remaining_time = current_process->remaining_time;
+//         current_time = current_time + remaining_time;
+//         current_process->completion_time = current_process->completion_time + remaining_time;
 
-        updateProcess(current_process, 0, current_process->completion_time);
-        calculateTurnaroundTime(current_process);
-        calculateWaitingTime(current_process);
+//         updateProcess(current_process, 0, current_process->completion_time);
+//         calculateTurnaroundTime(current_process);
+//         calculateWaitingTime(current_process);
 
-        printf("Process %d completed at time %d in queue 3, turnaround time: %d, waiting time: %d\n",
-               current_process->process_id,
-               current_process->completion_time,
-               current_process->turnaround_time,
-               current_process->waiting_time);
-      }
-    }
-  }
-}
+//         printf("Process %d completed at time %d in queue 3, turnaround time: %d, waiting time: %d\n",
+//                current_process->process_id,
+//                current_process->completion_time,
+//                current_process->turnaround_time,
+//                current_process->waiting_time);
+//       }
+//     }
+//   }
+// }
 
 // void preemptive_sjf(struct CPU_Scheduler *scheduler)
 // {

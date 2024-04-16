@@ -15,15 +15,15 @@ int main(){
     // printProcesses(scheduler1);
     // calculateMetrics(scheduler1->processes, num_processes1);
 
-    int num_processes1 = 5;
-    int arrival_times1[] = {3, 4, 5, 6, 7};
-    int burst_times1[] = {5, 3, 1, 2, 3};
-    int priorities1[] = {0, 0, 0, 0};
-    struct CPU_Scheduler* scheduler1 = initScheduler(num_processes1, arrival_times1, burst_times1, priorities1);
-    printProcesses(scheduler1);
-    round_robin(scheduler1->processes,5, 2);
-    printProcesses(scheduler1);
-    calculateMetrics(scheduler1->processes, num_processes1);
+    // int num_processes1 = 5;
+    // int arrival_times1[] = {3, 4, 5, 6, 7};
+    // int burst_times1[] = {5, 3, 1, 2, 3};
+    // int priorities1[] = {0, 0, 0, 0};
+    // struct CPU_Scheduler* scheduler1 = initScheduler(num_processes1, arrival_times1, burst_times1, priorities1);
+    // printProcesses(scheduler1);
+    // round_robin(scheduler1->processes,5, 2);
+    // printProcesses(scheduler1);
+    // calculateMetrics(scheduler1->processes, num_processes1);
 
     // Simulating Shortest Job First Scheduling
     // int num_processes2 = 5;
@@ -32,9 +32,19 @@ int main(){
     // int priorities2[] = {0, 0, 0, 0};
     // struct CPU_Scheduler* scheduler2 = initScheduler(num_processes2, arrival_times2, burst_times2, priorities2);
     // printProcesses(scheduler2);
-    // np_sjf(scheduler2->ready_queue);
+    // np_sjf(scheduler2->processes,5);
     // printProcesses(scheduler2);
     // calculateMetrics(scheduler2->processes, num_processes2);
+
+    int num_processes2 = 5;
+    int arrival_times2[] = {2, 5, 1, 0, 4};
+    int burst_times2[] = {6, 2, 8, 3, 4};
+    int priorities2[] = {0, 0, 0, 0};
+    struct CPU_Scheduler* scheduler2 = initScheduler(num_processes2, arrival_times2, burst_times2, priorities2);
+    printProcesses(scheduler2);
+    np_sjf(scheduler2->processes,5);
+    printProcesses(scheduler2);
+    calculateMetrics(scheduler2->processes, num_processes2);
 
     // Simulating Shortest Job First Scheduling
     // int num_processes3 = 4;

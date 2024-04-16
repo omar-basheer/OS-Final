@@ -3,6 +3,7 @@
 #include "scheduler.h"
 #include "algorithms.h"
 
+
 int main(){
     int num_processes1;
     int arrival_times1[100];

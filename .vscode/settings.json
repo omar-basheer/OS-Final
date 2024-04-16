@@ -1,5 +1,8 @@
 {
   "workbench.preferredLightColorTheme": "MacOS Modern Light - Ventura Xcode",
   "workbench.colorTheme": "Visual Studio Dark",
-  "workbench.preferredDarkColorTheme": "Visual Studio Dark"
+  "workbench.preferredDarkColorTheme": "Visual Studio Dark",
+  "files.associations": {
+    "process.h": "c"
+  }
 }

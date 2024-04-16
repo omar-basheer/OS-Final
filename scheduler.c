@@ -24,14 +24,6 @@ struct CPU_Scheduler* initScheduler(int num_processes, int *arrival_times, int *
     return scheduler;
 };
 
-// void addToReadyQueue(struct CPU_Scheduler* scheduler, struct Process* process) {
-//     enqueue(scheduler->ready_queue, process);
-// };
-
-// struct Process* getNextProcess(struct CPU_Scheduler* scheduler) {
-//     return dequeue(scheduler->ready_queue);
-// };
-
 void printProcesses(struct CPU_Scheduler* scheduler) {
     printf("Processes:\n");
     printf("--------------------------------------------------------------------------------------------------------------\n");

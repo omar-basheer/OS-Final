@@ -1,15 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <sys/wait.h>
+#include <unistd.h>
 #include "process.h"
 
 struct Process* createProcess(int process_id, int arrival_time, int burst_time){
   struct Process* process = (struct Process*)malloc(sizeof(struct Process));
-  if (process == NULL) {
-    printf("Memory allocation failed for process.\n");
-    exit(EXIT_FAILURE);
-  }
-  process->process_id = process_id;
+//   if (process == NULL) {
+//     printf("Memory allocation failed for process.\n");
+//     exit(EXIT_FAILURE);
+//   }
+
+  process->process_id = fork();
   process->arrival_time = arrival_time;
   process->burst_time = burst_time;
   process->remaining_time = burst_time; // Initially, remaining time is same as burst time
@@ -19,8 +21,19 @@ struct Process* createProcess(int process_id, int arrival_time, int burst_time){
   process->last_start_time = 0;
   process->past = false;
 
-  return process;
+if (process->process_id == -1){
+    printf("Fork failed.\n");
+    exit(EXIT_FAILURE);
+  }
+  else if(process->process_id == 0){
+    exit(EXIT_SUCCESS);
+  }
+  else{
+    return process;
+  }
+  return NULL;
 };
+
 
 /**
  * Updates the process with the given remaining time and completion time.

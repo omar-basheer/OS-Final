@@ -11,7 +11,6 @@ struct ReadyQueue {
 struct CPU_Scheduler {
   int num_processes;
   struct Process *processes;
-  struct Queue *ready_queue;
 };
 
 struct CPU_Scheduler* initScheduler(int num_processes, int *arrival_times, int *burst_times, int *priorities);

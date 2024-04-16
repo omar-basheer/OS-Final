@@ -3,7 +3,7 @@
 
 #include "process.h"
 
-struct Process* createProcess(int process_id, int arrival_time, int burst_time, int priority){
+struct Process* createProcess(int process_id, int arrival_time, int burst_time){
   struct Process* process = (struct Process*)malloc(sizeof(struct Process));
   if (process == NULL) {
     printf("Memory allocation failed for process.\n");
@@ -12,7 +12,6 @@ struct Process* createProcess(int process_id, int arrival_time, int burst_time, 
   process->process_id = process_id;
   process->arrival_time = arrival_time;
   process->burst_time = burst_time;
-  process->priority = priority;
   process->remaining_time = burst_time; // Initially, remaining time is same as burst time
   process->completion_time = 0; // Initialize completion time to 0
   process->turnaround_time = 0; // Initialize turnaround time to 0

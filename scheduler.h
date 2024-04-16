@@ -13,7 +13,7 @@ struct CPU_Scheduler {
   struct Process *processes;
 };
 
-struct CPU_Scheduler* initScheduler(int num_processes, int *arrival_times, int *burst_times, int *priorities);
+struct CPU_Scheduler* initScheduler(int num_processes, int *arrival_times, int *burst_times);
 void addToReadyQueue(struct CPU_Scheduler* scheduler, struct Process* process);
 struct Process* getNextProcess(struct CPU_Scheduler* scheduler);
 void printProcesses(struct CPU_Scheduler* scheduler);

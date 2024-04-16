@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct CPU_Scheduler* initScheduler(int num_processes, int *arrival_times, int *burst_times, int *priorities) {
+struct CPU_Scheduler* initScheduler(int num_processes, int *arrival_times, int *burst_times) {
     struct CPU_Scheduler* scheduler = (struct CPU_Scheduler*)malloc(sizeof(struct CPU_Scheduler));
     if (scheduler == NULL) {
         printf("Memory allocation failed for scheduler.\n");
@@ -19,7 +19,7 @@ struct CPU_Scheduler* initScheduler(int num_processes, int *arrival_times, int *
     scheduler->num_processes = num_processes;
 
     for (int i = 0; i < num_processes; i++) {
-        scheduler->processes[i] = *createProcess(i + 1, arrival_times[i], burst_times[i], priorities[i]);
+        scheduler->processes[i] = *createProcess(i + 1, arrival_times[i], burst_times[i]);
     }
     return scheduler;
 };

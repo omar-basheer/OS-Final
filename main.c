@@ -12,18 +12,16 @@ int main(){
     int num_processes2;
     int arrival_times2[100];
     int burst_times2[100];
-    int time_slice2;
 
     int num_processes3;
     int arrival_times3[100];
     int burst_times3[100];
-    int time_slice3_1;
-    int time_slice3_2;
 
     int num_processes4;
     int arrival_times4[100];
     int burst_times4[100];
-    int time_slice4;
+    int time_slice4_1;
+    int time_slice4_2;
 
     printf("\n");
     printf("\n");
@@ -37,7 +35,8 @@ int main(){
     printf("Select a scheduling algorithm to simulate:\n");
     printf("1. Round Robin\n");
     printf("2. Shortest Job First (Non-Preemptive)\n");
-    printf("3. Multi-Level Feedback Queue\n");
+    printf("3. Shortest Job First (Preemptive)\n");
+    printf("4. Multi-Level Feedback Queue\n");
     printf("\n");
 
     printf("Enter your choice (enter the corresponding number): ");
@@ -92,6 +91,7 @@ int main(){
             printf("Algorithm metrics:\n");
             printf("\n");
             calculateMetrics(scheduler1->processes, num_processes1);
+            printf("--------------------------------------------------------------------------------------------------------------\n");
             break;
 
         case 2:
@@ -134,13 +134,14 @@ int main(){
             printf("Algorithm metrics:\n");
             printf("\n");
             calculateMetrics(scheduler2->processes, num_processes2);
+            printf("--------------------------------------------------------------------------------------------------------------\n");
             break;
 
         case 3:
-            printf("You selected Multi-Level Feedback Queue Scheduling.\n");
+            printf("You selected Shortest Job First Scheduling (Preemptive).\n");
             printf("\n");
 
-            // Get inputs for Multi-Level Feedback Queue parameters
+            // Get inputs for Shortest Job First parameters
             // Number of processes
             printf("Enter the number of processes: ");
             scanf("%d", &num_processes3);
@@ -161,23 +162,14 @@ int main(){
             }
             printf("\n");
 
-            // Time slices for each queue
-            printf("Enter time slice for Queue 1: ");
-            scanf("%d", &time_slice3_1);
-            printf("\n");
-
-            printf("Enter time slice for Queue 2: ");
-            scanf("%d", &time_slice3_2);
-            printf("\n");
-
-            // Run Multi-Level Feedback Queue algorithm
-            printf("Running Multi-Level Feedback Queue algorithm...\n");
+            // Run Shortest Job First algorithm
+            printf("Running Shortest Job First (Preemptive) algorithm...\n");
             printf("\n");
             struct CPU_Scheduler* scheduler3 = initScheduler(num_processes3, arrival_times3, burst_times3);
             printf("\n");
             printf("Initial Processes:\n");
             printProcesses(scheduler3);
-            mlfq(scheduler3->processes, num_processes3, time_slice3_1, time_slice3_2);
+            pp_sjf(scheduler3->processes, num_processes3);
             printf("\n");
             printf("Final Processes:\n");
             printProcesses(scheduler3);
@@ -185,10 +177,64 @@ int main(){
             printf("Algorithm metrics:\n");
             printf("\n");
             calculateMetrics(scheduler3->processes, num_processes3);
+            printf("--------------------------------------------------------------------------------------------------------------\n");
+            break;
+
+        case 4:
+            printf("You selected Multi-Level Feedback Queue Scheduling.\n");
+            printf("\n");
+
+            // Get inputs for Multi-Level Feedback Queue parameters
+            // Number of processes
+            printf("Enter the number of processes: ");
+            scanf("%d", &num_processes4);
+            printf("\n");
+
+            // Arrival times and burst times for each process
+            printf("Enter arrival times for each process:\n");
+            for (int i = 0; i < num_processes4; i++) {
+                printf("Arrival time for process %d: ", i+1);
+                scanf("%d", &arrival_times4[i]);
+            }
+            printf("\n");
+
+            printf("Enter burst times for each process:\n");
+            for (int i = 0; i < num_processes4; i++) {
+                printf("Burst time for process %d: ", i+1);
+                scanf("%d", &burst_times4[i]);
+            }
+            printf("\n");
+
+            // Time slices for each queue
+            printf("Enter time slice for Queue 1: ");
+            scanf("%d", &time_slice4_1);
+            printf("\n");
+
+            printf("Enter time slice for Queue 2: ");
+            scanf("%d", &time_slice4_2);
+            printf("\n");
+
+            // Run Multi-Level Feedback Queue algorithm
+            printf("Running Multi-Level Feedback Queue algorithm...\n");
+            printf("\n");
+            struct CPU_Scheduler* scheduler4 = initScheduler(num_processes4, arrival_times4, burst_times4);
+            printf("\n");
+            printf("Initial Processes:\n");
+            printProcesses(scheduler4);
+            mlfq(scheduler4->processes, num_processes4, time_slice4_1, time_slice4_2);
+            printf("\n");
+            printf("Final Processes:\n");
+            printProcesses(scheduler4);
+            printf("\n");
+            printf("Algorithm metrics:\n");
+            printf("\n");
+            calculateMetrics(scheduler4->processes, num_processes4);
+            printf("--------------------------------------------------------------------------------------------------------------\n");
             break;
 
         default:
             printf("Invalid choice. Exiting...\n");
+            printf("--------------------------------------------------------------------------------------------------------------\n");
             exit(EXIT_FAILURE);
     }
 

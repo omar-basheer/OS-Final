@@ -28,6 +28,11 @@ Users can specify the number of processes they wish to simulate and select the s
 - A Youtube link to the  simulation video demonstrating the program running correctly.
 
 ## How to Run?
+- gcc -o my_program main.c process.c scheduler.c algorithms.c queue.c
+- ./my_program  
+- chmod +x run_project.sh  
+- ./run_project.sh  
+
 
 
 ## Contributors

@@ -18,6 +18,7 @@ struct Queue *initQueue();
 void enqueue(struct Queue *queue, struct Process *process);
 struct Process *dequeue(struct Queue *queue);
 struct Process* dequeueProcess(struct Queue* queue, struct Process* process_to_remove);
+void printQueue(struct Queue* queue);
 struct Process *peek(struct Queue *queue);
 int isEmpty(struct Queue *queue);
 

@@ -4,56 +4,92 @@
 #include "process.h"
 #include "scheduler.h"
 
-#define TIME_SLICE 2
 
-void round_robin(struct Queue *ready_queue)
-{
-  printf("Round Robin Scheduling\n");
+void round_robin(struct Process *processes, int num_processes, int time_slice){
+  struct Queue *ready_queue = initQueue();
   int current_time = 0;
-  while (!isEmpty(ready_queue))
-  {
-    struct Process *current_process = dequeue(ready_queue);
+  int total_burst_time = 0;
 
-    int remaining_time = current_process->remaining_time;
-    if (remaining_time <= 0)
-    {
-      // process completes within time slice
-      current_time = current_time + remaining_time;
-      current_process->completion_time = current_process->completion_time + remaining_time;
+  for(int i = 0; i < num_processes; i++){
+    total_burst_time += processes[i].burst_time;
+  }
 
-      updateProcess(current_process, 0, current_process->completion_time);
-      calculateTurnaroundTime(current_process);
-      calculateWaitingTime(current_process);
+  while (total_burst_time > 0){
+    
+    if (!isEmpty(ready_queue)){
+      printQueue(ready_queue);
+      struct Process *current_process = dequeue(ready_queue);
+      printQueue(ready_queue);
 
-      printf("Process %d completed at time %d, turnaround time: %d, waiting time: %d\n",
-             current_process->process_id,
-             current_process->completion_time,
-             current_process->turnaround_time,
-             current_process->waiting_time);
-    }
-    else
-    {
-      // process needs more time, stop execution at time slice
-      if (remaining_time < TIME_SLICE)
-      {
-        current_time = current_time + remaining_time;
+      // execute process for time slice or until completion
+      if (current_process->remaining_time <= time_slice){
+        current_time += current_process->remaining_time;
+        printf("current time: %d, updated in execute to completion\n", current_time);
+        current_process->completion_time = current_time;
+        total_burst_time -= current_process->remaining_time;
+        current_process->remaining_time = 0;
+        calculateTurnaroundTime(current_process);
+        calculateWaitingTime(current_process);
+
+        printf("Process %d completed at time %d, turnaround time: %d, waiting time: %d\n",
+               current_process->process_id,
+               current_process->completion_time,
+               current_process->turnaround_time,
+               current_process->waiting_time);
       }
-      else
-      {
-        current_time = current_time + TIME_SLICE;
+      else{
+        current_time += time_slice;
+        printf("current time: %d, updated in execute for time slice\n", current_time);
+        current_process->remaining_time -= time_slice;
+        current_process->completion_time = current_time;
+        total_burst_time -= time_slice;
+        printf("Process %d preempted at time %d\n", current_process->process_id, current_time);
       }
-      current_process->completion_time = current_time;
-      remaining_time = remaining_time - TIME_SLICE;
-      if (remaining_time < 0)
-      {
-        remaining_time = 0;
-      };
-      updateProcess(current_process, remaining_time, current_process->completion_time);
-      printf("Process %d preemted at time %d\n", current_process->process_id, current_process->completion_time);
-      enqueue(ready_queue, current_process);
+
+      // Check if any new processes have arrived and add them to the ready queue
+      printf("checking for new processes after execution\n");
+      for (int j = 0; j<num_processes; j++){
+        if (processes[j].arrival_time <= current_time && processes[j].past == false){
+          printf("Process %d arrived at time %d, current time: %d\n", processes[j].process_id, processes[j].arrival_time, current_time);
+          processes[j].past = true;
+          enqueue(ready_queue, &processes[j]);
+        }
+      }
+
+      if (current_process->remaining_time > 0){
+        enqueue(ready_queue, current_process);
+      }
+      printf("\n");
+
+    }else{
+
+      printf("queue is empty\n");
+      printf("current time: %d\n", current_time);
+
+      printf("\n");
+      printf("checking for new processes\n");
+      for (int j = 0; j<num_processes; j++){
+        if (processes[j].arrival_time <= current_time && processes[j].past == false){
+          printf("Process %d arrived at time %d, current time: %d\n", processes[j].process_id, processes[j].arrival_time, current_time);
+          processes[j].past = true;
+          enqueue(ready_queue, &processes[j]);
+        }
+      }
+      // current_time += time_slice;
+      // printf("current time: %d, updated in else\n", current_time);
+
+      printQueue(ready_queue);
+      printf("\n");
+
+      if (total_burst_time <= 0){
+        break;
+      }
     }
   }
-};
+  printf("\n");
+  printf("Round Robin Scheduling Complete\n");
+
+}
 
 void np_sjf(struct Queue *ready_queue)
 {
@@ -100,65 +136,6 @@ void np_sjf(struct Queue *ready_queue)
              shortest_process->waiting_time);
 
       current_time = shortest_process->completion_time;
-    }
-  }
-}
-
-void shortestTimeRemaining(struct Queue *queue)
-{
-  if (isEmpty(queue))
-  {
-    printf("Queue is empty. Cannot schedule.\n");
-    return;
-  };
-
-  struct Queue *tempQueue = initQueue();
-  struct Process *currentProcess = NULL;
-  int totalProcessses = queue->size;
-  int currentTime = 0;
-
-  while (totalProcessses > 0)
-  {
-    while (!isEmpty(queue) && queue->head->process->arrival_time <= currentTime)
-    {
-      currentProcess = dequeue(queue);
-      enqueue(tempQueue, currentProcess);
-    }
-
-    struct QueueNode *tempNode = tempQueue->head;
-    struct Process *shortestRemainingProcess = tempNode->process;
-    while (tempNode != NULL)
-    {
-      if (tempNode->process->remaining_time < shortestRemainingProcess->remaining_time)
-      {
-        shortestRemainingProcess = tempNode->process;
-      }
-      tempNode = tempNode->next;
-    }
-
-    if (shortestRemainingProcess != NULL)
-    {
-      int remainingTime = shortestRemainingProcess->remaining_time - 1;
-      currentTime++;
-      if (remainingTime == 0)
-      {
-        shortestRemainingProcess->completion_time = currentTime;
-        calculateTurnaroundTime(shortestRemainingProcess);
-        calculateWaitingTime(shortestRemainingProcess);
-        totalProcessses--;
-        printf("Process %d completed at time %d.\n", shortestRemainingProcess->process_id, currentTime);
-      }
-      else
-      {
-        shortestRemainingProcess->remaining_time = remainingTime;
-        enqueue(tempQueue, shortestRemainingProcess);
-        printf("Process %d preempted at time %d.\n", shortestRemainingProcess->process_id, currentTime);
-      }
-    }
-
-    else
-    {
-      currentTime++;
     }
   }
 }
@@ -317,73 +294,77 @@ void mlfq(struct Queue *queue, int q1_time_slice, int q2_time_slice)
   }
 }
 
-void runPreemptiveSJF(struct CPU_Scheduler *scheduler)
-{
-  printf("Preemptive Shortest Job First Scheduling\n");
-  int currentTime = 0;
-  struct Process *currentProcess = NULL;
-  int isCPUIdle = 1;
+// void preemptive_sjf(struct CPU_Scheduler *scheduler)
+// {
+//   printf("Preemptive Shortest Job First Scheduling\n");
+//   int currentTime = 0;
+//   struct Process *currentProcess = NULL;
+//   int isCPUIdle = 1;
 
-  printf("Starting Preemptive SJF Simulation\n");
+//   printf("Starting Preemptive SJF Simulation\n");
 
-  while (!isEmpty(scheduler->ready_queue))
-  {
-    // Check and enqueue newly arrived processes
-    for (int i = 0; i < scheduler->num_processes; i++)
-    {
-      if (scheduler->processes[i].arrival_time == currentTime)
-      {
-        printf("Time %d: Process %d arrives\n", currentTime, scheduler->processes[i].process_id);
-        enqueue(scheduler->ready_queue, &scheduler->processes[i]);
-      }
-    }
+//   while (!isEmpty(scheduler->ready_queue))
+//   {
+//     // Check and enqueue newly arrived processes
+//     for (int i = 0; i < scheduler->num_processes; i++)
+//     {
+//       if (scheduler->processes[i].arrival_time == currentTime)
+//       {
+//         printf("Time %d: Process %d arrives\n", currentTime, scheduler->processes[i].process_id);
+//         enqueue(scheduler->ready_queue, &scheduler->processes[i]);
+//       }
+//     }
 
-    // Decide on preemption or continuation of the current process
-    if (!isCPUIdle && !isEmpty(scheduler->ready_queue) &&
-        peek(scheduler->ready_queue)->remaining_time < currentProcess->remaining_time)
-    {
-      if (peek(scheduler->ready_queue)->remaining_time > 0)
-      {
-        printf("Time %d: Process %d preempted by Process %d\n", currentTime, currentProcess->process_id, peek(scheduler->ready_queue)->process_id);
-        currentProcess->remaining_time -= (currentTime - currentProcess->last_start_time);
-        enqueue(scheduler->ready_queue, currentProcess);
-        isCPUIdle = 1;
-      }
+//     // Decide on preemption or continuation of the current process
+//     if (!isCPUIdle && !isEmpty(scheduler->ready_queue) &&
+//         peek(scheduler->ready_queue)->remaining_time < currentProcess->remaining_time)
+//     {
+//       if (peek(scheduler->ready_queue)->remaining_time > 0)
+//       {
+//         printf("Time %d: Process %d preempted by Process %d\n", currentTime, currentProcess->process_id, peek(scheduler->ready_queue)->process_id);
+//         currentProcess->remaining_time -= (currentTime - currentProcess->last_start_time);
+//         enqueue(scheduler->ready_queue, currentProcess);
+//         isCPUIdle = 1;
+//       }
 
-      else
-      {
-        enqueue(scheduler->ready_queue, currentProcess);
-        currentProcess = dequeue(scheduler->ready_queue);
-        printf("Time %d: Process %d starts execution\n", currentTime, currentProcess->process_id);
-        currentProcess->last_start_time = currentTime;
-      }
-    }
+//       else
+//       {
+//         enqueue(scheduler->ready_queue, currentProcess);
+//         currentProcess = dequeue(scheduler->ready_queue);
+//         printf("Time %d: Process %d starts execution\n", currentTime, currentProcess->process_id);
+//         currentProcess->last_start_time = currentTime;
+//       }
+//     }
 
-    if (isCPUIdle && !isEmpty(scheduler->ready_queue))
-    {
-      currentProcess = dequeue(scheduler->ready_queue);
-      if (currentProcess->remaining_time > 0)
-      {
-        printf("Time %d: Process %d starts execution\n", currentTime, currentProcess->process_id);
-        currentProcess->last_start_time = currentTime;
-        isCPUIdle = 0;
-      }
-    }
+//     if (isCPUIdle && !isEmpty(scheduler->ready_queue))
+//     {
+//       currentProcess = dequeue(scheduler->ready_queue);
+//       if (currentProcess->remaining_time > 0)
+//       {
+//         printf("Time %d: Process %d starts execution\n", currentTime, currentProcess->process_id);
+//         currentProcess->last_start_time = currentTime;
+//         isCPUIdle = 0;
+//       }
+//     }
 
-    // Process execution for a time unit
-    if (!isCPUIdle)
-    {
-      currentProcess->remaining_time--;
-      if (currentProcess->remaining_time <= 0)
-      {
-        printf("Time %d: Process %d completes execution\n", currentTime + 1, currentProcess->process_id);
-        isCPUIdle = 1;
-        currentProcess = NULL;
-      }
-    }
+//     // Process execution for a time unit
+//     if (!isCPUIdle)
+//     {
+//       currentProcess->remaining_time--;
+//       if (currentProcess->remaining_time <= 0)
+//       {
+//         printf("Time %d: Process %d completes execution\n", currentTime + 1, currentProcess->process_id);
+//         currentProcess->completion_time = currentTime + 1;
+//         calculateTurnaroundTime(currentProcess);
+//         calculateWaitingTime(currentProcess);
+//         printf("Process %d turnaround time: %d, waiting time: %d\n", currentProcess->process_id, currentProcess->turnaround_time, currentProcess->waiting_time);
+//         isCPUIdle = 1;
+//         currentProcess = NULL;
+//       }
+//     }
 
-    currentTime++;
-  }
+//     currentTime++;
+//   }
 
-  printf("Preemptive SJF Simulation Complete\n");
-}
+//   printf("Preemptive SJF Simulation Complete\n");
+// }

@@ -41,8 +41,6 @@ void enqueue (struct Queue* queue, struct Process* process){
 
 };
 
-
-
 struct Process* dequeue (struct Queue* queue){
   struct QueueNode* newNode = (struct QueueNode*)malloc(sizeof(struct QueueNode));
   if (isEmpty(queue)){
@@ -60,6 +58,22 @@ struct Process* dequeue (struct Queue* queue){
   return dequeuedProcess;
 
 };
+
+void printQueue(struct Queue* queue) {
+    if (isEmpty(queue)) {
+        printf("Queue is empty.\n");
+        return;
+    }
+
+    struct QueueNode* current = queue->head;
+    printf("Queue: ");
+    while (current != NULL) {
+        printf("%d ", current->process->process_id);
+        current = current->next;
+    }
+    printf("\n");
+}
+
 
 struct Process* dequeueProcess(struct Queue* queue, struct Process* process_to_remove) {
     if (isEmpty(queue)) {

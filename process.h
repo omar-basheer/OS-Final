@@ -2,6 +2,7 @@
 #define PROCESS_H
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 struct Process {
   int process_id;
@@ -13,6 +14,7 @@ struct Process {
   int turnaround_time;
   int waiting_time;
   int last_start_time;
+  bool past;
 };
 
 

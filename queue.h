@@ -21,6 +21,7 @@ struct Process* dequeueProcess(struct Queue* queue, struct Process* process_to_r
 void printQueue(struct Queue* queue);
 struct Process *peek(struct Queue *queue);
 int isEmpty(struct Queue *queue);
+void sortQueue(struct Queue *queue);
 
 
 #endif /* QUEUE_H */

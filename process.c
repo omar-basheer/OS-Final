@@ -17,7 +17,7 @@ struct Process* createProcess(int process_id, int arrival_time, int burst_time, 
   process->completion_time = 0; // Initialize completion time to 0
   process->turnaround_time = 0; // Initialize turnaround time to 0
   process->waiting_time = 0; // Initialize waiting time to 0
-  process->last_start_time = 0;
+  process->start_time = 0;
   process->past = false;
 
   return process;

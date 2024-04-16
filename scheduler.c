@@ -34,16 +34,16 @@ struct CPU_Scheduler* initScheduler(int num_processes, int *arrival_times, int *
 
 void printProcesses(struct CPU_Scheduler* scheduler) {
     printf("Processes:\n");
-    printf("---------------------------------------------------------------------------------------------------------\n");
+    printf("--------------------------------------------------------------------------------------------------------------\n");
     printf("| Process ID | Arrival Time | Burst Time | Completion Time | Turnaround Time | Waiting Time | Remaining Time |\n");
-    printf("---------------------------------------------------------------------------------------------------------\n");
+    printf("--------------------------------------------------------------------------------------------------------------\n");
     for (int i = 0; i < scheduler->num_processes; i++) {
         struct Process* process = &(scheduler->processes[i]);
-        printf("| %-11d| %-13d| %-11d| %-16d| %-15d| %-13d| %-15d|\n", 
+        printf("| %-11d| %-13d| %-11d| %-16d| %-16d| %-13d| %-15d|\n", 
                process->process_id, process->arrival_time, process->burst_time, 
                process->completion_time, process->turnaround_time, process->waiting_time, process->remaining_time);
     }
-    printf("---------------------------------------------------------------------------------------------------------\n");
+    printf("--------------------------------------------------------------------------------------------------------------\n");
     printf("\n");
 }
 

@@ -19,6 +19,7 @@ void round_robin(struct Process *processes, int num_processes, int time_slice){
     if (!isEmpty(ready_queue)){
       printQueue(ready_queue);
       struct Process *current_process = dequeue(ready_queue);
+      printf("process %d dequeued\n", current_process->process_id);
       printQueue(ready_queue);
 
       // execute process for time slice or until completion
@@ -62,12 +63,10 @@ void round_robin(struct Process *processes, int num_processes, int time_slice){
       printf("\n");
 
     }else{
-
-      printf("queue is empty\n");
       printf("current time: %d\n", current_time);
-
       printf("\n");
       printf("checking for new processes\n");
+
       for (int j = 0; j<num_processes; j++){
         if (processes[j].arrival_time <= current_time && processes[j].past == false){
           printf("Process %d arrived at time %d, current time: %d\n", processes[j].process_id, processes[j].arrival_time, current_time);
@@ -75,8 +74,11 @@ void round_robin(struct Process *processes, int num_processes, int time_slice){
           enqueue(ready_queue, &processes[j]);
         }
       }
-      // current_time += time_slice;
-      // printf("current time: %d, updated in else\n", current_time);
+
+      if (isEmpty(ready_queue)){
+        current_time++;
+        printf("no new processes have arrived, current time: %d\n", current_time);
+      }
 
       printQueue(ready_queue);
       printf("\n");

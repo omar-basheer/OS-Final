@@ -5,8 +5,18 @@
 
 int main(){
     // Simulating Round Robin Scheduling
+    // int num_processes1 = 5;
+    // int arrival_times1[] = {0, 1, 2, 3, 4};
+    // int burst_times1[] = {5, 3, 1, 2, 3};
+    // int priorities1[] = {0, 0, 0, 0};
+    // struct CPU_Scheduler* scheduler1 = initScheduler(num_processes1, arrival_times1, burst_times1, priorities1);
+    // printProcesses(scheduler1);
+    // round_robin(scheduler1->processes,5, 2);
+    // printProcesses(scheduler1);
+    // calculateMetrics(scheduler1->processes, num_processes1);
+
     int num_processes1 = 5;
-    int arrival_times1[] = {0, 1, 2, 3, 4};
+    int arrival_times1[] = {3, 4, 5, 6, 7};
     int burst_times1[] = {5, 3, 1, 2, 3};
     int priorities1[] = {0, 0, 0, 0};
     struct CPU_Scheduler* scheduler1 = initScheduler(num_processes1, arrival_times1, burst_times1, priorities1);

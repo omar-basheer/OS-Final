@@ -51,6 +51,7 @@ void round_robin(struct Process *processes, int num_processes, int time_slice){
                current_process->completion_time,
                current_process->turnaround_time,
                current_process->waiting_time);
+        printf("Process %d work, sum = %lld\n", current_process->process_id, current_process->work);
       }
       else{
         current_time += time_slice;
@@ -157,6 +158,7 @@ void np_sjf(struct Process *processes, int num_processes){
              shortest_process->completion_time,
              shortest_process->turnaround_time,
              shortest_process->waiting_time);
+       printf("Process %d work, sum = %lld\n", shortest_process->process_id, shortest_process->work);
 
       // Check for new processes and add them to the ready queue
       printf("\nChecking for new processes after execution\n");
@@ -260,6 +262,7 @@ void pp_sjf(struct Process *processes, int num_processes){
                shortest_process->turnaround_time,
                shortest_process->waiting_time);
       }
+       printf("Process %d work, sum = %lld\n", shortest_process->process_id, shortest_process->work);
 
       printf("\n");
 
@@ -328,7 +331,9 @@ void mlfq (struct Process *processes, int num_processes, int q1_time_slice, int 
                current_process->completion_time,
                current_process->turnaround_time,
                current_process->waiting_time);
+        printf("Process %d work, sum = %lld\n", current_process->process_id, current_process->work);
       }
+      
       else{
         current_time += q1_time_slice;
         printf("Current Time: %d (Process %d preempted after time slice in Queue 1)\n", current_time, current_process->process_id);
@@ -374,6 +379,8 @@ void mlfq (struct Process *processes, int num_processes, int q1_time_slice, int 
                current_process->completion_time,
                current_process->turnaround_time,
                current_process->waiting_time);
+
+      printf("Process %d work, sum = %lld\n", current_process->process_id, current_process->work);
       }
       else{
         current_time += q2_time_slice;
@@ -424,6 +431,7 @@ void mlfq (struct Process *processes, int num_processes, int q1_time_slice, int 
               current_process->completion_time,
               current_process->turnaround_time,
               current_process->waiting_time);
+      printf("Process %d work, sum = %lld\n", current_process->process_id, current_process->work);
     }
 
     if(isEmpty(ready_queue) && isEmpty(queue2) && isEmpty(queue3)){

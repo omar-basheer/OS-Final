@@ -3,36 +3,45 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include "process.h"
+#include <time.h>
+
+
 
 struct Process* createProcess(int process_id, int arrival_time, int burst_time){
-  struct Process* process = (struct Process*)malloc(sizeof(struct Process));
-//   if (process == NULL) {
-//     printf("Memory allocation failed for process.\n");
-//     exit(EXIT_FAILURE);
-//   }
+    struct Process* process = (struct Process*)malloc(sizeof(struct Process));
+    if (process == NULL) {
+        printf("Memory allocation failed for process.\n");
+        exit(EXIT_FAILURE);
+    }
 
-  process->process_id = fork();
-  process->arrival_time = arrival_time;
-  process->burst_time = burst_time;
-  process->remaining_time = burst_time; // Initially, remaining time is same as burst time
-  process->completion_time = 0; // Initialize completion time to 0
-  process->turnaround_time = 0; // Initialize turnaround time to 0
-  process->waiting_time = 0; // Initialize waiting time to 0
-  process->last_start_time = 0; // Initialize waiting time to 0
-  process->past = false; 
+    process->process_id = fork();
+    process->arrival_time = arrival_time;
+    process->burst_time = burst_time;
+    process->remaining_time = burst_time;
+    process->completion_time = 0;
+    process->turnaround_time = 0;
+    process->waiting_time = 0;
+    process->last_start_time = 0;
+    process->past = false;
+    
 
-if (process->process_id == -1){
-    printf("Fork failed.\n");
-    exit(EXIT_FAILURE);
-  }
-  else if(process->process_id == 0){
-    exit(EXIT_SUCCESS);
-  }
-  else{
-    return process;
-  }
-  return NULL;
+    if (process->process_id == -1){
+        printf("Fork failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    else if(process->process_id == 0){
+        exit(EXIT_SUCCESS);
+    }
+    else{
+        process->work = 0;
+        for (int i = 1; i < 100; i++) {
+            process->work += (rand() % 100) + 1;
+        }
+        return process;
+    }
+    return NULL;
 };
+
 
 
 /**

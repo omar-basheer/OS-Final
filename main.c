@@ -2,9 +2,11 @@
 #include <stdlib.h>
 #include "scheduler.h"
 #include "algorithms.h"
+#include <time.h>
 
 
 int main(){
+    srand(time(NULL));
     int num_processes1;
     int arrival_times1[100];
     int burst_times1[100];

@@ -4,25 +4,34 @@
 #include "algorithms.h"
 
 
+int getValidInput() {
+    int num;
+    char buffer[256];
+    int result;
+    while (1) {
+        result = scanf("%d", &num);
+        if (result == EOF) {
+            // End of file encountered
+            printf("End of input reached.\n");
+            exit(EXIT_FAILURE);
+        } else if (result == 0) {
+            // Invalid input (non-numeric)
+            printf("Invalid input. Please enter a number: ");
+            // Clear the input buffer to prevent infinite loop
+            fgets(buffer, sizeof(buffer), stdin);
+        } else {
+            // Valid input
+            break;
+        }
+    }
+    return num;
+}
+
 int main(){
-    int num_processes1;
-    int arrival_times1[100];
-    int burst_times1[100];
-    int time_slice1;
-
-    int num_processes2;
-    int arrival_times2[100];
-    int burst_times2[100];
-
-    int num_processes3;
-    int arrival_times3[100];
-    int burst_times3[100];
-
-    int num_processes4;
-    int arrival_times4[100];
-    int burst_times4[100];
-    int time_slice4_1;
-    int time_slice4_2;
+    int num_processes1, arrival_times1[100], burst_times1[100], time_slice1;
+    int num_processes2, arrival_times2[100], burst_times2[100];
+    int num_processes3, arrival_times3[100], burst_times3[100];
+    int num_processes4, arrival_times4[100], burst_times4[100], time_slice4_1, time_slice4_2;
 
     printf("\n");
     printf("\n");
@@ -53,27 +62,31 @@ int main(){
             // Get inputs for Round Robin parameters
             // Number of processes
             printf("Enter the number of processes: ");
-            scanf("%d", &num_processes1);
+            num_processes1 = getValidInput();
+            // scanf("%d", &num_processes1);
             printf("\n");
             
             // Arrival times and burst times for each process
             printf("Enter arrival times for each process:\n");
             for (int i = 0; i < num_processes1; i++) {
                 printf("Arrival time for process %d: ", i+1);
-                scanf("%d", &arrival_times1[i]);
+                arrival_times1[i] = getValidInput();
+                // scanf("%d", &arrival_times1[i]);
             }
             printf("\n");
 
             printf("Enter burst times for each process:\n");
             for (int i = 0; i < num_processes1; i++) {
                 printf("Burst time for process %d: ", i+1);
-                scanf("%d", &burst_times1[i]);
+                burst_times1[i] = getValidInput();
+                // scanf("%d", &burst_times1[i]);
             }
             printf("\n");
 
             // Time slice
             printf("Enter time slice: ");
-            scanf("%d", &time_slice1);
+            time_slice1 = getValidInput();
+            // scanf("%d", &time_slice1);
             printf("\n");
             printf("\n");
 
@@ -102,21 +115,24 @@ int main(){
             // Get inputs for Shortest Job First parameters
             // Number of processes
             printf("Enter the number of processes: ");
-            scanf("%d", &num_processes2);
+            num_processes2 = getValidInput();
+            // scanf("%d", &num_processes2);
             printf("\n");
 
             // Arrival times and burst times for each process
             printf("Enter arrival times for each process:\n");
             for (int i = 0; i < num_processes2; i++) {
                 printf("Arrival time for process %d: ", i+1);
-                scanf("%d", &arrival_times2[i]);
+                arrival_times2[i] = getValidInput();
+                // scanf("%d", &arrival_times2[i]);
             }
             printf("\n");
 
             printf("Enter burst times for each process:\n");
             for (int i = 0; i < num_processes2; i++) {
                 printf("Burst time for process %d: ", i+1);
-                scanf("%d", &burst_times2[i]);
+                burst_times2[i] = getValidInput();
+                // scanf("%d", &burst_times2[i]);
             }
             printf("\n");
 
@@ -145,21 +161,24 @@ int main(){
             // Get inputs for Shortest Job First parameters
             // Number of processes
             printf("Enter the number of processes: ");
-            scanf("%d", &num_processes3);
+            num_processes3 = getValidInput();
+            // scanf("%d", &num_processes3);
             printf("\n");
 
             // Arrival times and burst times for each process
             printf("Enter arrival times for each process:\n");
             for (int i = 0; i < num_processes3; i++) {
                 printf("Arrival time for process %d: ", i+1);
-                scanf("%d", &arrival_times3[i]);
+                arrival_times3[i] = getValidInput();
+                // scanf("%d", &arrival_times3[i]);
             }
             printf("\n");
 
             printf("Enter burst times for each process:\n");
             for (int i = 0; i < num_processes3; i++) {
                 printf("Burst time for process %d: ", i+1);
-                scanf("%d", &burst_times3[i]);
+                burst_times3[i] = getValidInput();
+                // scanf("%d", &burst_times3[i]);
             }
             printf("\n");
 
@@ -188,31 +207,36 @@ int main(){
             // Get inputs for Multi-Level Feedback Queue parameters
             // Number of processes
             printf("Enter the number of processes: ");
-            scanf("%d", &num_processes4);
+            num_processes4 = getValidInput();
+            // scanf("%d", &num_processes4);
             printf("\n");
 
             // Arrival times and burst times for each process
             printf("Enter arrival times for each process:\n");
             for (int i = 0; i < num_processes4; i++) {
                 printf("Arrival time for process %d: ", i+1);
-                scanf("%d", &arrival_times4[i]);
+                arrival_times4[i] = getValidInput();
+                // scanf("%d", &arrival_times4[i]);
             }
             printf("\n");
 
             printf("Enter burst times for each process:\n");
             for (int i = 0; i < num_processes4; i++) {
                 printf("Burst time for process %d: ", i+1);
-                scanf("%d", &burst_times4[i]);
+                burst_times4[i] = getValidInput();
+                // scanf("%d", &burst_times4[i]);
             }
             printf("\n");
 
             // Time slices for each queue
             printf("Enter time slice for Queue 1: ");
-            scanf("%d", &time_slice4_1);
+            time_slice4_1 = getValidInput();
+            // scanf("%d", &time_slice4_1);
             printf("\n");
 
             printf("Enter time slice for Queue 2: ");
-            scanf("%d", &time_slice4_2);
+            time_slice4_2 = getValidInput();
+            // scanf("%d", &time_slice4_2);
             printf("\n");
 
             // Run Multi-Level Feedback Queue algorithm

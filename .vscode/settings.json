@@ -4,5 +4,6 @@
   "workbench.preferredDarkColorTheme": "Visual Studio Dark",
   "files.associations": {
     "process.h": "c"
-  }
+  },
+  "editor.fontSize": 14
 }

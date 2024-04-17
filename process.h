@@ -14,6 +14,7 @@ struct Process {
   int waiting_time;
   int last_start_time;
   bool past;
+  long long work;
 };
 
 

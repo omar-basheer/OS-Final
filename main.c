@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "scheduler.h"
 #include "algorithms.h"
+#include <time.h>
 
 
 int getValidInput() {
@@ -28,6 +29,7 @@ int getValidInput() {
 }
 
 int main(){
+    srand(time(NULL));
     int num_processes1, arrival_times1[100], burst_times1[100], time_slice1;
     int num_processes2, arrival_times2[100], burst_times2[100];
     int num_processes3, arrival_times3[100], burst_times3[100];
